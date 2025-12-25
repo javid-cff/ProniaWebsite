@@ -13,6 +13,6 @@ namespace Pronia.Models
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
         public int CategoryId { get; set; }
-        public Category Category { get; set; } = null!;
+        public Category? Category { get; set; }
     }
 }

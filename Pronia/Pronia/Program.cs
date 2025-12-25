@@ -11,7 +11,7 @@ namespace Pronia
 
             builder.Services.AddDbContext<ProniaDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Aca"));
             });
 
             // Add services to the container.

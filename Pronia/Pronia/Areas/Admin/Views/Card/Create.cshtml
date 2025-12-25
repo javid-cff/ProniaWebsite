@@ -1,8 +1,5 @@
 ﻿@model Pronia.Models.Card
 
-@{
-    ViewData["Title"] = "Create Card";
-}
 
 <div class="container" style="margin-top:30px;">
     <div class="row justify-content-center">
@@ -10,7 +7,7 @@
             <div style="background-color:GhostWhite; padding:30px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
                 <h2 style="margin-bottom:20px; color:SlateBlue;">Create New Card</h2>
 
-                <form method="post" asp-action="Create">
+                <form asp-area="Admin" method="post" asp-action="Create">
 
                     <div style="margin-bottom:15px;">
                         <div>

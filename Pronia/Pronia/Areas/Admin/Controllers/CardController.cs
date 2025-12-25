@@ -24,25 +24,30 @@ namespace Pronia.Areas.Admin.Controllers
 
             ViewBag.Categories = categories;
 
-            return View(new Card());
+            return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(Card card)
         {
-            var categories = await _context.Categories.ToListAsync();
-
-            ViewBag.Categories = categories;
-
             if (!ModelState.IsValid) 
             {
-                return View(card);
+                var categories = await _context.Categories.ToListAsync();
+
+                ViewBag.Categories = categories;
+                return View();
             }
+
+           
+
 
             var isExistsCategory = await _context.Categories.AnyAsync(x => x.Id == card.CategoryId);
 
-            if (!isExistsCategory) 
+            if (!isExistsCategory)
             {
+                var categories = await _context.Categories.ToListAsync();
+
+                ViewBag.Categories = categories;
                 ModelState.AddModelError("CategoryId", "Bele bir category movcud deyil!");
                 return View(card);
             }
