@@ -1,0 +1,97 @@
+﻿@model List<Card>
+
+<div class="container">
+    <div class="row">
+        <table class="table" style="width:100%; border-collapse:collapse; font-family:Segoe UI, Arial, sans-serif; background-color:GhostWhite; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+            <thead>
+                <tr style="background-color:SlateBlue; color:White;">
+                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Id</th>
+                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Title</th>
+                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Description</th>
+                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Image</th>
+                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Category Name</th>
+                    <th scope="col" style="padding:14px; border-bottom:2px solid White; position:relative;">
+                        Actions
+                        <a asp-area="Admin" asp-action="Create"
+                           style="position:absolute; text-decoration:none; right:10px; top:50%; transform:translateY(-50%);
+                                  background-color:Green; border:none; color:white; width:40px; height:40px;
+                                  border-radius:8px; cursor:pointer; font-size:20px; display:flex;
+                                  align-items:center; justify-content:center; transition:background-color 0.2s ease;"
+                           onmouseover="this.style.backgroundColor='DarkGreen';"
+                           onmouseout="this.style.backgroundColor='Green';">
+                            ➕
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Card card in Model)
+                {
+                    <tr style="background-color:WhiteSmoke; transition:background-color 0.2s ease, transform 0.2s ease;"
+                        onmouseover="this.style.backgroundColor='LightCyan'; this.style.transform='scale(1.01)';"
+                        onmouseout="this.style.backgroundColor='WhiteSmoke'; this.style.transform='scale(1)';">
+
+                        <th scope="row" style="padding:12px; color:MidnightBlue; font-weight:600; border-bottom:1px solid LightGray;">
+                            @card.Id
+                        </th>
+
+                        <td style="padding:12px; color:Black; border-bottom:1px solid LightGray;
+                                       white-space:normal; word-break:break-word; overflow-wrap:anywhere;">
+                            @card.Title
+                        </td>
+
+                        <td style="padding:12px; color:DimGray; border-bottom:1px solid LightGray;
+                                       white-space:normal; word-break:break-word; overflow-wrap:anywhere;">
+                            @card.Description
+                        </td>
+
+                        <td style="padding:12px; border-bottom:1px solid LightGray;">
+                            <img src="~@card.ImageUrl" alt="Image"
+                                 style="width:50px; height:50px; object-fit:cover; border-radius:4px;
+                                            border:1px solid #ccc; transition:transform 0.2s ease;"
+                                 onmouseover="this.style.transform='scale(1.2)';"
+                                 onmouseout="this.style.transform='scale(1)';">
+                        </td>
+
+                        <td style="padding:12px; color:DimGray; border-bottom:1px solid LightGray;
+                                           white-space:normal; word-break:break-word; overflow-wrap:anywhere;">
+                            @card.Category.Name
+                        </td>
+
+                        <td style="padding:12px; border-bottom:1px solid LightGray;">
+                            <div style="display:flex; justify-content:center; gap:6px; width:100%;">
+                                <a asp-action="Update" asp-route-id="@card.Id" style="text-decoration:none; background-color:Gold; border:none; width:35px; height:35px;
+                                              border-radius:6px; cursor:pointer; font-size:16px; display:flex;
+                                              align-items:center; justify-content:center;">✏️</a>
+                                <a asp-action="Delete" asp-route-id="@card.Id"
+                                   style="text-decoration:none; background-color:Crimson; border:none; width:35px; height:35px;
+                                              border-radius:6px; cursor:pointer; font-size:16px; display:flex;
+                                              align-items:center; justify-content:center;">🗑️</a>
+                                <a style="text-decoration:none; background-color:DeepSkyBlue; border:none; width:35px; height:35px;
+                                              border-radius:6px; cursor:pointer; font-size:16px; display:flex;
+                                              align-items:center; justify-content:center;">🟢</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

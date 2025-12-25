@@ -11,8 +11,8 @@ using Pronia.Contexts;
 namespace Pronia.Migrations
 {
     [DbContext(typeof(ProniaDbContext))]
-    [Migration("20251222185440_AddCardsTable")]
-    partial class AddCardsTable
+    [Migration("20251224235136_AddCardsCategoriesTable")]
+    partial class AddCardsCategoriesTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,8 +32,10 @@ namespace Pronia.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
@@ -42,11 +44,42 @@ namespace Pronia.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Cards");
+                });
+
+            modelBuilder.Entity("Pronia.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cards");
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Pronia.Models.Card", b =>
+                {
+                    b.HasOne("Pronia.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }

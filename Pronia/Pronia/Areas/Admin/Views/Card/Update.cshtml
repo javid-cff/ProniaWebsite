@@ -1,0 +1,57 @@
+﻿@model Pronia.Models.Card
+
+@{
+    ViewData["Title"] = "Update Card";
+}
+
+<div class="container" style="margin-top:30px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div style="background-color:GhostWhite; padding:30px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                <h2 style="margin-bottom:20px; color:SlateBlue;">Update Card</h2>
+
+                <form method="post" asp-action="Update" asp-controller="Card">
+
+                    <div style="margin-bottom:15px;">
+                        <div>
+                            <label for="title" style="font-weight:600;">Title</label>
+                        </div>
+                        <div>
+                            <input asp-for="Title" id="title" placeholder="Enter card title" class="form-control"
+                                   style="padding:10px; border-radius:6px; border:1px solid LightGray;" />
+                            <span class="text-danger" asp-validation-for="Title"></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:15px;">
+                        <div>
+                            <label for="description" style="font-weight:600;">Description</label>
+                        </div>
+                        <div>
+                            <textarea asp-for="Description" id="description" placeholder="Enter card description" class="form-control"
+                                      style="padding:10px; border-radius:6px; border:1px solid LightGray;" rows="4"></textarea>
+                            <span class="text-danger" asp-validation-for="Description"></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:15px;">
+                        <div>
+                            <label for="imageUrl" style="font-weight:600;">Image</label>
+                        </div>
+                        <div>
+                            <input asp-for="ImageUrl" id="imageUrl" accept="image/*" class="form-control"
+                                   style="padding:5px; border-radius:6px; border:1px solid LightGray;" />
+                            <span class="text-danger" asp-validation-for="ImageUrl"></span>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                        <a asp-action="Index" class="btn btn-secondary" style="padding:10px 20px; border-radius:6px;">Cancel</a>
+                        <button type="submit" class="btn btn-success" style="padding:10px 20px; border-radius:6px;">Update</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
