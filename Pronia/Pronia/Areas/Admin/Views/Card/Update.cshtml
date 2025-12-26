@@ -36,6 +36,23 @@
 
                     <div style="margin-bottom:15px;">
                         <div>
+                            <label for="CategoryId" style="font-weight:600;">Category</label>
+                        </div>
+                        <div>
+                            <select asp-for="CategoryId" id="CategoryId">
+                                <option value="null" disabled selected>--Category secin--</option>
+                                @foreach (Category category in ViewBag.Categories)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+
+                            </select>
+                            <span class="text-danger" asp-validation-for="CategoryId"></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:15px;">
+                        <div>
                             <label for="imageUrl" style="font-weight:600;">Image</label>
                         </div>
                         <div>

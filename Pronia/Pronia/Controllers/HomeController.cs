@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Pronia.Contexts;
 using Pronia.Models;
 
@@ -14,9 +15,9 @@ namespace Pronia.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var cards = _context.Cards.ToList();
+            var cards = await _context.Cards.Where(c => c.isOnline).Include(c => c.Category).ToListAsync();
             return View(cards);
         }
 

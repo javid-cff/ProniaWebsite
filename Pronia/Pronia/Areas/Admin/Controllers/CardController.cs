@@ -20,9 +20,7 @@ namespace Pronia.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var categories = await _context.Categories.ToListAsync();
-
-            ViewBag.Categories = categories;
+            await SendCategoriesViewBag();
 
             return View();
         }
@@ -32,22 +30,17 @@ namespace Pronia.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid) 
             {
-                var categories = await _context.Categories.ToListAsync();
-
-                ViewBag.Categories = categories;
-                return View();
+                await SendCategoriesViewBag();
+                return View(card);
             }
-
-           
 
 
             var isExistsCategory = await _context.Categories.AnyAsync(x => x.Id == card.CategoryId);
 
             if (!isExistsCategory)
             {
-                var categories = await _context.Categories.ToListAsync();
+                await SendCategoriesViewBag();
 
-                ViewBag.Categories = categories;
                 ModelState.AddModelError("CategoryId", "Bele bir category movcud deyil!");
                 return View(card);
             }
@@ -72,14 +65,23 @@ namespace Pronia.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Update(int id) 
+        public async Task<IActionResult> Update(int id)
         {
+            await SendCategoriesViewBag();
+
             var card = await _context.Cards.FindAsync(id);
 
-            if ( card is not { })
+            if (card is not { })
                 return NotFound();
 
             return View(card);
+        }
+
+        private async Task SendCategoriesViewBag()
+        {
+            var categories = await _context.Categories.ToListAsync();
+
+            ViewBag.Categories = categories;
         }
 
         [HttpPost]
@@ -87,7 +89,9 @@ namespace Pronia.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                await SendCategoriesViewBag();
+
+                return View(card);
             }
 
             var existCard = await _context.Cards.FindAsync(card.Id);
@@ -95,8 +99,19 @@ namespace Pronia.Areas.Admin.Controllers
             if (existCard is null)
                 return BadRequest();
 
+            var isExistsCategory = await _context.Categories.AnyAsync(x => x.Id == card.CategoryId);
+
+            if (!isExistsCategory)
+            {
+                await SendCategoriesViewBag();
+
+                ModelState.AddModelError("CategoryId", "Bele bir category movcud deyil!");
+                return View(card);
+            }
+
             existCard.Title = card.Title;
             existCard.Description = card.Description;
+            existCard.CategoryId = card.CategoryId;
             existCard.ImageUrl = card.ImageUrl;
 
             _context.Cards.Update(existCard);
@@ -104,5 +119,18 @@ namespace Pronia.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ToggleIsOnline(int id)
+        {
+            var card = await _context.Cards.FindAsync(id);
+            if (card == null) return NotFound();
+
+            card.isOnline = !card.isOnline;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

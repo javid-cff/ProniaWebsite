@@ -762,3 +762,4 @@ C:\Users\Student\Source\Repos\ProniaWebsite\Pronia\Pronia\obj\Debug\net8.0\refin
 C:\Users\Student\Source\Repos\ProniaWebsite\Pronia\Pronia\obj\Debug\net8.0\Pronia.pdb
 C:\Users\Student\Source\Repos\ProniaWebsite\Pronia\Pronia\obj\Debug\net8.0\Pronia.genruntimeconfig.cache
 C:\Users\Student\Source\Repos\ProniaWebsite\Pronia\Pronia\obj\Debug\net8.0\ref\Pronia.dll
+C:\Users\Admin\Desktop\Pronia Website\Pronia\Pronia\obj\Debug\net8.0\Pronia.sourcelink.json
