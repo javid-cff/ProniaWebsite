@@ -5,82 +5,66 @@
         <table class="table" style="width:100%; border-collapse:collapse; font-family:Segoe UI, Arial, sans-serif; background-color:GhostWhite; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
             <thead>
                 <tr style="background-color:SlateBlue; color:White;">
-                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Id</th>
-                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Title</th>
-                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Description</th>
-                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Image</th>
-                    <th scope="col" style="padding:14px; border-bottom:2px solid White;">Category Name</th>
+                    <th style="padding:14px; border-bottom:2px solid White;">Id</th>
+                    <th style="padding:14px; border-bottom:2px solid White;">Title</th>
+                    <th style="padding:14px; border-bottom:2px solid White;">Description</th>
+                    <th style="padding:14px; border-bottom:2px solid White;">Image</th>
 
-                    <th scope="col" style="padding:14px; border-bottom:2px solid White; text-align:center;">
+                    <th style="padding:14px; border-bottom:2px solid White; text-align:center;">
                         Is Online
                     </th>
 
-                    <th scope="col" style="padding:14px; border-bottom:2px solid White; position:relative;">
+                    <th style="padding:14px; border-bottom:2px solid White; position:relative;">
                         Actions
                         <a asp-area="Admin" asp-action="Create"
-                           style="position:absolute; text-decoration:none; right:10px; top:50%; transform:translateY(-50%);
-                                  background-color:Green; border:none; color:white; width:40px; height:40px;
-                                  border-radius:8px; cursor:pointer; font-size:20px; display:flex;
-                                  align-items:center; justify-content:center; transition:background-color 0.2s ease;"
-                           onmouseover="this.style.backgroundColor='DarkGreen';"
-                           onmouseout="this.style.backgroundColor='Green';">
+                           style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
+                                  background-color:Green; color:white; width:40px; height:40px;
+                                  border-radius:8px; display:flex; align-items:center; justify-content:center;
+                                  text-decoration:none;">
                             ➕
                         </a>
                     </th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (Card card in Model)
                 {
-                    <tr style="background-color:WhiteSmoke; transition:background-color 0.2s ease, transform 0.2s ease;"
-                        onmouseover="this.style.backgroundColor='LightCyan'; this.style.transform='scale(1.01)';"
-                        onmouseout="this.style.backgroundColor='WhiteSmoke'; this.style.transform='scale(1)';">
+                    <tr style="background-color:WhiteSmoke;"
+                        onmouseover="this.style.backgroundColor='LightCyan';"
+                        onmouseout="this.style.backgroundColor='WhiteSmoke';">
 
-                        <th scope="row" style="padding:12px; color:MidnightBlue; font-weight:600; border-bottom:1px solid LightGray;">
-                            @card.Id
-                        </th>
+                        <td style="padding:12px; font-weight:600;">@card.Id</td>
 
-                        <td style="padding:12px; color:Black; border-bottom:1px solid LightGray;">
-                            @card.Title
+                        <td style="padding:12px;">@card.Title</td>
+
+                        <td style="padding:12px; color:DimGray;">@card.Description</td>
+
+                        <td style="padding:12px;">
+                            <img src="~/assets/images/website-images/@card.ImageUrl"
+                                 style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
                         </td>
 
-                        <td style="padding:12px; color:DimGray; border-bottom:1px solid LightGray;">
-                            @card.Description
+                        <td style="padding:12px; text-align:center;">
+                            @(card.isOnline ? "✔" : "✖")
                         </td>
 
-                        <td style="padding:12px; border-bottom:1px solid LightGray;">
-                            <img src="~@card.ImageUrl" alt="Image"
-                                 style="width:50px; height:50px; object-fit:cover; border-radius:4px;
-                                            border:1px solid #ccc;">
-                        </td>
-
-                        <td style="padding:12px; color:DimGray; border-bottom:1px solid LightGray;">
-                            @card.Category.Name
-                        </td>
-
-                        <td style="padding:12px; border-bottom:1px solid LightGray; text-align:center;">
-                            @if (card.isOnline)
-                            {
-                                <span style="color:green; font-size:20px;">✔</span>
-                            }
-                            else
-                            {
-                                <span style="color:red; font-size:20px;">✖</span>
-                            }
-                        </td>
-
-                        <td style="padding:12px; border-bottom:1px solid LightGray;">
-                            <div style="display:flex; justify-content:center; gap:6px; width:100%;">
+                        <td style="padding:12px;">
+                            <div style="display:flex; justify-content:center; gap:6px;">
                                 <a asp-action="Update" asp-route-id="@card.Id"
-                                   style="text-decoration:none; background-color:Gold; width:35px; height:35px;
-                                              border-radius:6px; display:flex; align-items:center; justify-content:center;">✏️</a>
+                                   style="background-color:Gold; width:35px; height:35px;
+                                              border-radius:6px; display:flex; align-items:center; justify-content:center;
+                                              text-decoration:none;">✏️</a>
 
                                 <a asp-action="Delete" asp-route-id="@card.Id"
-                                   style="text-decoration:none; background-color:Crimson; width:35px; height:35px;
-                                              border-radius:6px; display:flex; align-items:center; justify-content:center;">🗑️</a>
+                                   style="background-color:Crimson; width:35px; height:35px;
+                                              border-radius:6px; display:flex; align-items:center; justify-content:center;
+                                              text-decoration:none;">🗑️</a>
 
-                                <a asp-area="Admin" asp-action="ToggleIsOnline" asp-route-id="@card.Id" style="text-decoration:none; background-color:DeepSkyBlue; width:35px; height:35px;
-                                              border-radius:6px; display:flex; align-items:center; justify-content:center;">🟢</a>
+                                <a asp-area="Admin" asp-action="ToggleIsOnline" asp-route-id="@card.Id"
+                                   style="background-color:DeepSkyBlue; width:35px; height:35px;
+                                              border-radius:6px; display:flex; align-items:center; justify-content:center;
+                                              text-decoration:none;">🟢</a>
                             </div>
                         </td>
                     </tr>

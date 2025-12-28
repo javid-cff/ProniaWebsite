@@ -17,8 +17,12 @@ namespace Pronia.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var cards = await _context.Cards.Where(c => c.isOnline).Include(c => c.Category).ToListAsync();
-            return View(cards);
+            List<Card> cards = await _context.Cards.Where(c => c.isOnline).ToListAsync();
+            List<Product> products = await _context.Products.Where(c => c.isDeleted).ToListAsync();
+
+            var model = Tuple.Create(cards, products);
+
+            return View(model);
         }
 
         public IActionResult Privacy()

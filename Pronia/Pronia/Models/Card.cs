@@ -12,10 +12,6 @@ namespace Pronia.Models
         [MinLength(3)]
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
-
-        public int CategoryId { get; set; }
-        public Category? Category { get; set; }
-
         public bool isOnline { get; set; }
     }
 }

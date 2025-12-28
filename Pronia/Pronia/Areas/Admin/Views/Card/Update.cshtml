@@ -13,53 +13,24 @@
                 <form method="post" asp-action="Update" asp-controller="Card">
 
                     <div style="margin-bottom:15px;">
-                        <div>
-                            <label for="title" style="font-weight:600;">Title</label>
-                        </div>
-                        <div>
-                            <input asp-for="Title" id="title" placeholder="Enter card title" class="form-control"
-                                   style="padding:10px; border-radius:6px; border:1px solid LightGray;" />
-                            <span class="text-danger" asp-validation-for="Title"></span>
-                        </div>
+                        <label for="title" style="font-weight:600;">Title</label>
+                        <input asp-for="Title" id="title" placeholder="Enter card title" class="form-control"
+                               style="padding:10px; border-radius:6px; border:1px solid LightGray;" />
+                        <span class="text-danger" asp-validation-for="Title"></span>
                     </div>
 
                     <div style="margin-bottom:15px;">
-                        <div>
-                            <label for="description" style="font-weight:600;">Description</label>
-                        </div>
-                        <div>
-                            <textarea asp-for="Description" id="description" placeholder="Enter card description" class="form-control"
-                                      style="padding:10px; border-radius:6px; border:1px solid LightGray;" rows="4"></textarea>
-                            <span class="text-danger" asp-validation-for="Description"></span>
-                        </div>
+                        <label for="description" style="font-weight:600;">Description</label>
+                        <textarea asp-for="Description" id="description" placeholder="Enter card description" class="form-control"
+                                  style="padding:10px; border-radius:6px; border:1px solid LightGray;" rows="4"></textarea>
+                        <span class="text-danger" asp-validation-for="Description"></span>
                     </div>
 
                     <div style="margin-bottom:15px;">
-                        <div>
-                            <label for="CategoryId" style="font-weight:600;">Category</label>
-                        </div>
-                        <div>
-                            <select asp-for="CategoryId" id="CategoryId">
-                                <option value="null" disabled selected>--Category secin--</option>
-                                @foreach (Category category in ViewBag.Categories)
-                                {
-                                    <option value="@category.Id">@category.Name</option>
-                                }
-
-                            </select>
-                            <span class="text-danger" asp-validation-for="CategoryId"></span>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom:15px;">
-                        <div>
-                            <label for="imageUrl" style="font-weight:600;">Image</label>
-                        </div>
-                        <div>
-                            <input asp-for="ImageUrl" id="imageUrl" accept="image/*" class="form-control"
-                                   style="padding:5px; border-radius:6px; border:1px solid LightGray;" />
-                            <span class="text-danger" asp-validation-for="ImageUrl"></span>
-                        </div>
+                        <label for="imageUrl" style="font-weight:600;">Image</label>
+                        <input asp-for="ImageUrl" id="imageUrl" accept="image/*" class="form-control"
+                               style="padding:5px; border-radius:6px; border:1px solid LightGray;" />
+                        <span class="text-danger" asp-validation-for="ImageUrl"></span>
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">

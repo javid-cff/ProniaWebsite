@@ -13,35 +13,20 @@ namespace Pronia.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var card = await _context.Cards.ToListAsync();
-            var cards = await _context.Cards.Include(c => c.Category).ToListAsync();
-            return View(cards);
+            return View(card);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            await SendCategoriesViewBag();
-
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(Card card)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
-                await SendCategoriesViewBag();
-                return View(card);
-            }
-
-
-            var isExistsCategory = await _context.Categories.AnyAsync(x => x.Id == card.CategoryId);
-
-            if (!isExistsCategory)
-            {
-                await SendCategoriesViewBag();
-
-                ModelState.AddModelError("CategoryId", "Bele bir category movcud deyil!");
                 return View(card);
             }
 
@@ -67,8 +52,6 @@ namespace Pronia.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
-            await SendCategoriesViewBag();
-
             var card = await _context.Cards.FindAsync(id);
 
             if (card is not { })
@@ -77,20 +60,11 @@ namespace Pronia.Areas.Admin.Controllers
             return View(card);
         }
 
-        private async Task SendCategoriesViewBag()
-        {
-            var categories = await _context.Categories.ToListAsync();
-
-            ViewBag.Categories = categories;
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Update(Card card) 
+        public async Task<IActionResult> Update(Card card)
         {
             if (!ModelState.IsValid)
             {
-                await SendCategoriesViewBag();
-
                 return View(card);
             }
 
@@ -99,20 +73,10 @@ namespace Pronia.Areas.Admin.Controllers
             if (existCard is null)
                 return BadRequest();
 
-            var isExistsCategory = await _context.Categories.AnyAsync(x => x.Id == card.CategoryId);
-
-            if (!isExistsCategory)
-            {
-                await SendCategoriesViewBag();
-
-                ModelState.AddModelError("CategoryId", "Bele bir category movcud deyil!");
-                return View(card);
-            }
-
             existCard.Title = card.Title;
             existCard.Description = card.Description;
-            existCard.CategoryId = card.CategoryId;
             existCard.ImageUrl = card.ImageUrl;
+            existCard.isOnline = card.isOnline;
 
             _context.Cards.Update(existCard);
             await _context.SaveChangesAsync();
