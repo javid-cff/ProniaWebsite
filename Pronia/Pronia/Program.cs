@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pronia.Contexts;
+using Pronia.Models;
 
 namespace Pronia
 {
@@ -13,6 +15,21 @@ namespace Pronia
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
             });
+
+            builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
+
+                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireDigit = true;
+            }).AddEntityFrameworkStores<ProniaDbContext>().AddDefaultTokenProviders();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -30,6 +47,7 @@ namespace Pronia
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseRouting();

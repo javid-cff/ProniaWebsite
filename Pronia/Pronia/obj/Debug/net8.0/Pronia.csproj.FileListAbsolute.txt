@@ -763,3 +763,8 @@ C:\Users\Student\Source\Repos\ProniaWebsite\Pronia\Pronia\obj\Debug\net8.0\Proni
 C:\Users\Student\Source\Repos\ProniaWebsite\Pronia\Pronia\obj\Debug\net8.0\Pronia.genruntimeconfig.cache
 C:\Users\Student\Source\Repos\ProniaWebsite\Pronia\Pronia\obj\Debug\net8.0\ref\Pronia.dll
 C:\Users\Admin\Desktop\Pronia Website\Pronia\Pronia\obj\Debug\net8.0\Pronia.sourcelink.json
+C:\Users\Admin\Desktop\Pronia Website\Pronia\Pronia\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+C:\Users\Admin\Desktop\Pronia Website\Pronia\Pronia\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+C:\Users\Admin\Desktop\Pronia Website\Pronia\Pronia\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Users\Admin\Desktop\Pronia Website\Pronia\Pronia\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
+C:\Users\Admin\Desktop\Pronia Website\Pronia\Pronia\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll

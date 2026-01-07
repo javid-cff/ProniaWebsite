@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Pronia.Models;
 
 namespace Pronia.Contexts
 {
-    public class ProniaDbContext : DbContext
+    public class ProniaDbContext : IdentityDbContext<AppUser>
     {
         public DbSet<Card> Cards { get; set; }
         public DbSet<Category> Categories { get; set; }
