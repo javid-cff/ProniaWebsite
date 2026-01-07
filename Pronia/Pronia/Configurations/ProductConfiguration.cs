@@ -13,7 +13,7 @@ namespace Pronia.Configurations
             builder.Property(p => p.Price).IsRequired().HasColumnType("decimal(18,2)");
             builder.ToTable(p => p.HasCheckConstraint("CK_Product_Price", "[Price] > 0"));
 
-            builder.HasOne(x => x.Category).WithMany(p => p.Products)
+            builder.HasOne(x => x.Category).WithMany(x => x.Products)
                 .HasForeignKey(x => x.CategoryId).HasPrincipalKey(x => x.Id).OnDelete(DeleteBehavior.Restrict);
         }
     }

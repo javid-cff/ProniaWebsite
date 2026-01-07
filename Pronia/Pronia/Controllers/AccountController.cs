@@ -45,7 +45,7 @@ namespace Pronia.Controllers
                 ModelState.AddModelError("", error.Description);
             }
 
-            return View(vm);
+            return RedirectToAction("Login");
         }
 
         [HttpGet]
@@ -68,9 +68,9 @@ namespace Pronia.Controllers
                 return View(vm);
             }
 
-            var result = await signInManager.CheckPasswordSignInAsync(user, vm.Password, lockoutOnFailure: false);
+            var result = await userManager.CheckPasswordAsync(user, vm.Password);
 
-            if(!result.Succeeded)
+            if(!result)
             {
                 ModelState.AddModelError("", "UserName ve ya Sifre Yanlisdir!");
                 return View(vm);
