@@ -1,4 +1,4 @@
-﻿@model Product
+﻿@model Pronia.ViewModels.ProductVM
 
 @{
     ViewData["Title"] = "Update Product";
@@ -12,7 +12,14 @@
 
                 <h2 style="margin-bottom:20px; color:SlateBlue;">Update Product</h2>
 
-                <form method="post" asp-action="Update" asp-area="Admin">
+                <form asp-area="Admin"
+                      asp-controller="Product"
+                      asp-action="Update"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <!-- Hidden Id -->
+                    <input type="hidden" asp-for="Id" />
 
                     <!-- Name -->
                     <div style="margin-bottom:15px;">
@@ -53,22 +60,76 @@
                                 class="form-control"
                                 style="padding:10px; border-radius:6px; border:1px solid LightGray;"
                                 asp-items="@(new SelectList(ViewBag.Categories, "Id", "Name"))">
+                            <option disabled value="">-- Category seçin --</option>
                         </select>
                         <span class="text-danger" asp-validation-for="CategoryId"></span>
                     </div>
 
-                    <!-- Image -->
+                    <!-- Main Image -->
                     <div style="margin-bottom:15px;">
-                        <label asp-for="ImagePath" style="font-weight:600;">Image</label>
-                        <input asp-for="ImagePath"
+                        <label style="font-weight:600;">Main Image</label>
+                        <div style="margin-bottom:10px;">
+                            @if (Model.MainImageFile != null)
+                            {
+                                <img src="~/assets/images/website-images/@Model.MainImageFile"
+                                     style="width:80px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ccc;" />
+                            }
+                        </div>
+                        <input asp-for="MainImageFile"
+                               type="file"
+                               accept="image/*"
                                class="form-control"
-                               style="padding:5px; border-radius:6px; border:1px solid LightGray;" />
-                        <span class="text-danger" asp-validation-for="ImagePath"></span>
+                               style="padding:6px; border-radius:6px; border:1px solid LightGray;" />
+                        <span class="text-danger" asp-validation-for="MainImageFile"></span>
+
+                        <!-- Hidden input to keep old main image -->
+                        <input type="hidden" asp-for="MainImageFile" />
+                    </div>
+
+                    <!-- Additional Images -->
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600;">Additional Images</label>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+                            @if (Model.AdditionalImageFiles != null && Model.AdditionalImageFiles.Any())
+                            {
+                                foreach (var img in Model.AdditionalImageFiles)
+                                {
+                                    if (img != null && !string.IsNullOrWhiteSpace(img.FileName))
+                                    {
+                                        <div style="position:relative;">
+                                            <img src="~/assets/images/website-images/@img.FileName"
+                                                 style="width:80px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ccc;" />
+                                        </div>
+                                    }
+                                }
+                            }
+
+                            <!-- Hidden inputs for existing images -->
+                            @if (Model.AdditionalImageFiles != null)
+                            {
+                                foreach (var path in Model.AdditionalImageFiles)
+                                {
+                                    <input type="hidden" name="AdditionalImageFiles" value="@path" />
+                                    <img src="~/assets/images/website-images/@path"
+                                         style="width:80px; height:80px; object-fit:cover; border-radius:6px; border:1px solid #ccc;" />
+                                }
+                            }
+                        </div>
+
+                        <input asp-for="AdditionalImageFiles"
+                               type="file"
+                               multiple
+                               accept="image/*"
+                               class="form-control"
+                               style="padding:6px; border-radius:6px; border:1px solid LightGray;" />
+                        <span class="text-danger" asp-validation-for="AdditionalImageFiles"></span>
                     </div>
 
                     <!-- Buttons -->
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-                        <a asp-action="Index"
+                        <a asp-area="Admin"
+                           asp-controller="Product"
+                           asp-action="Index"
                            class="btn btn-secondary"
                            style="padding:10px 20px; border-radius:6px;">
                             Cancel

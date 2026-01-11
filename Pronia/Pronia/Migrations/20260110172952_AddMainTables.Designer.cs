@@ -12,8 +12,8 @@ using Pronia.Contexts;
 namespace Pronia.Migrations
 {
     [DbContext(typeof(ProniaDbContext))]
-    [Migration("20260107002438_AddIdentity")]
-    partial class AddIdentity
+    [Migration("20260110172952_AddMainTables")]
+    partial class AddMainTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -292,8 +292,7 @@ namespace Pronia.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -362,12 +361,17 @@ namespace Pronia.Migrations
             modelBuilder.Entity("Pronia.Models.Product", b =>
                 {
                     b.HasOne("Pronia.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Pronia.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

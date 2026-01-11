@@ -1,4 +1,4 @@
-﻿@model List<Product>
+﻿@model List<ProductVM>
 
 <div class="container">
     <div class="row">
@@ -9,16 +9,18 @@
 
             <thead>
                 <tr style="background-color:SlateBlue; color:White;">
-                    <th style="padding:14px; border-bottom:2px solid White;">Id</th>
-                    <th style="padding:14px; border-bottom:2px solid White;">Name</th>
-                    <th style="padding:14px; border-bottom:2px solid White;">Description</th>
-                    <th style="padding:14px; border-bottom:2px solid White;">Price</th>
-                    <th style="padding:14px; border-bottom:2px solid White;">Image</th>
-                    <th style="padding:14px; border-bottom:2px solid White;">Category</th>
-                    <th style="padding:14px; border-bottom:2px solid White; text-align:center;">Online</th>
-                    <th style="padding:14px; border-bottom:2px solid White; position:relative;">
+                    <th style="padding:14px;">Id</th>
+                    <th style="padding:14px;">Name</th>
+                    <th style="padding:14px;">Description</th>
+                    <th style="padding:14px;">Price</th>
+                    <th style="padding:14px;">Image</th>
+                    <th style="padding:14px;">Category</th>
+                    <th style="padding:14px; text-align:center;">Online</th>
+                    <th style="padding:14px; position:relative;">
                         Actions
-                        <a asp-area="Admin" asp-action="Create"
+                        <a asp-area="Admin"
+                           asp-controller="Product"
+                           asp-action="Create"
                            style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
                                   background-color:Green; color:white; width:40px; height:40px;
                                   border-radius:8px; font-size:20px; display:flex;
@@ -30,7 +32,7 @@
             </thead>
 
             <tbody>
-                @foreach (Product product in Model)
+                @foreach (var product in Model)
                 {
                     <tr style="background-color:WhiteSmoke; transition:0.2s;"
                         onmouseover="this.style.backgroundColor='LightCyan'; this.style.transform='scale(1.01)'"
@@ -38,18 +40,21 @@
 
                         <td style="padding:12px; font-weight:600;">@product.Id</td>
                         <td style="padding:12px;">@product.Name</td>
-                        <td style="padding:12px; color:DimGray;">@(product.Description ?? "-")</td>
+                        <td style="padding:12px; color:DimGray;">
+                            @(string.IsNullOrWhiteSpace(product.Description) ? "-" : product.Description)
+                        </td>
                         <td style="padding:12px;">@product.Price ₼</td>
+
                         <td style="padding:12px;">
-                            <img src="~/assets/images/website-images/@product.ImagePath"
+                            <img src="~/assets/images/website-images/@product.MainImageFile"
                                  style="width:50px; height:50px; object-fit:cover;
                                             border-radius:4px; border:1px solid #ccc;" />
                         </td>
-                        <td style="padding:12px;">@product.Category?.Name</td>
 
-                        <!-- isDeleted column -->
+                        <td style="padding:12px;">@product.CategoryName</td>
+
                         <td style="padding:12px; text-align:center;">
-                            @if (product.isDeleted)
+                            @if (!product.isDeleted)
                             {
                                 <span style="color:Green; font-weight:600;">Yes</span>
                             }
@@ -59,28 +64,33 @@
                             }
                         </td>
 
-                        <!-- Actions -->
                         <td style="padding:12px;">
                             <div style="display:flex; justify-content:center; gap:6px;">
 
-                                <!-- Update -->
-                                <a asp-action="Update" asp-route-id="@product.Id"
+                                <a asp-area="Admin"
+                                   asp-controller="Product"
+                                   asp-action="Update"
+                                   asp-route-id="@product.Id"
                                    style="background-color:Gold; width:35px; height:35px;
                                               border-radius:6px; display:flex;
                                               align-items:center; justify-content:center; text-decoration:none;">
                                     ✏️
                                 </a>
 
-                                <!-- Delete -->
-                                <a asp-action="Delete" asp-route-id="@product.Id"
+                                <a asp-area="Admin"
+                                   asp-controller="Product"
+                                   asp-action="Delete"
+                                   asp-route-id="@product.Id"
                                    style="background-color:Crimson; width:35px; height:35px;
                                               border-radius:6px; display:flex;
                                               align-items:center; justify-content:center; text-decoration:none;">
                                     🗑️
                                 </a>
 
-                                <!-- Toggle -->
-                                <a asp-controller="Product" asp-action="Toggle" asp-route-id="@product.Id"
+                                <a asp-area="Admin"
+                                   asp-controller="Product"
+                                   asp-action="Toggle"
+                                   asp-route-id="@product.Id"
                                    style="background-color:DeepSkyBlue; width:35px; height:35px;
                                               border-radius:6px; display:flex;
                                               align-items:center; justify-content:center; text-decoration:none;">

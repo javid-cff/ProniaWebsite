@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pronia.Contexts;
+using Pronia.Interfaces;
 using Pronia.Models;
+using Pronia_MPA101.Services;
 
 namespace Pronia
 {
@@ -15,6 +17,7 @@ namespace Pronia
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
             });
+
 
             builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
             {
@@ -30,6 +33,9 @@ namespace Pronia
                 options.Password.RequireLowercase = true;
                 options.Password.RequireDigit = true;
             }).AddEntityFrameworkStores<ProniaDbContext>().AddDefaultTokenProviders();
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

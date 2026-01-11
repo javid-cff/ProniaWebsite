@@ -1,4 +1,4 @@
-﻿@model Product
+﻿@model ProductVM
 
 @{
     ViewData["Title"] = "Create Product";
@@ -12,7 +12,11 @@
 
                 <h2 style="margin-bottom:20px; color:SlateBlue;">Create New Product</h2>
 
-                <form asp-area="Admin" asp-action="Create" method="post">
+                <form asp-area="Admin"
+                      asp-controller="Product"
+                      asp-action="Create"
+                      method="post"
+                      enctype="multipart/form-data">
 
                     <!-- Name -->
                     <div style="margin-bottom:15px;">
@@ -59,22 +63,41 @@
                         <span class="text-danger" asp-validation-for="CategoryId"></span>
                     </div>
 
-                    <!-- Image -->
+                    <!-- Main Image -->
                     <div style="margin-bottom:15px;">
-                        <label asp-for="ImagePath" style="font-weight:600;">Image</label>
-                        <input asp-for="ImagePath"
+                        <label asp-for="MainImageFile" style="font-weight:600;">Main Image</label>
+                        <input asp-for="MainImageFile"
+                               type="file"
+                               accept="image/*"
                                class="form-control"
-                               style="padding:5px; border-radius:6px; border:1px solid LightGray;" />
-                        <span class="text-danger" asp-validation-for="ImagePath"></span>
+                               style="padding:6px; border-radius:6px; border:1px solid LightGray;" />
+                        <span class="text-danger" asp-validation-for="MainImageFile"></span>
+                    </div>
+
+                    <!-- Additional Images -->
+                    <div style="margin-bottom:15px;">
+                        <label asp-for="AdditionalImageFiles" style="font-weight:600;">
+                            Additional Images
+                        </label>
+                        <input asp-for="AdditionalImageFiles"
+                               type="file"
+                               multiple
+                               accept="image/*"
+                               class="form-control"
+                               style="padding:6px; border-radius:6px; border:1px solid LightGray;" />
+                        <span class="text-danger" asp-validation-for="AdditionalImageFiles"></span>
                     </div>
 
                     <!-- Buttons -->
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-                        <a asp-action="Index"
+                        <a asp-area="Admin"
+                           asp-controller="Product"
+                           asp-action="Index"
                            class="btn btn-secondary"
                            style="padding:10px 20px; border-radius:6px;">
                             Cancel
                         </a>
+
                         <button type="submit"
                                 class="btn btn-success"
                                 style="padding:10px 20px; border-radius:6px;">

@@ -12,8 +12,8 @@ using Pronia.Contexts;
 namespace Pronia.Migrations
 {
     [DbContext(typeof(ProniaDbContext))]
-    [Migration("20260107014218_AddedConfiguration")]
-    partial class AddedConfiguration
+    [Migration("20260111144739_AddConfigurationAndViewModels")]
+    partial class AddConfigurationAndViewModels
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -244,8 +244,7 @@ namespace Pronia.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("isOnline")
                         .HasColumnType("bit");
@@ -280,13 +279,16 @@ namespace Pronia.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AdditionalImagePaths")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImagePath")
+                    b.Property<string>("MainImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -361,12 +363,17 @@ namespace Pronia.Migrations
             modelBuilder.Entity("Pronia.Models.Product", b =>
                 {
                     b.HasOne("Pronia.Models.Category", "Category")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Pronia.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

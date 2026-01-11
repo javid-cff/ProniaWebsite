@@ -2,47 +2,80 @@
 using Microsoft.EntityFrameworkCore;
 using Pronia.Contexts;
 using Pronia.Models;
+using Pronia.ViewModels;
 
 namespace Pronia.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AutoValidateAntiforgeryToken]
-    public class ProductController(ProniaDbContext _context) : Controller
+    public class ProductController(ProniaDbContext _context, IWebHostEnvironment _env) : Controller
     {
+        private string ImagePath => Path.Combine(_env.WebRootPath, "assets/images/website-images");
+
         public async Task<IActionResult> Index()
         {
-            var product = await _context.Products.ToListAsync();
-            var products = await _context.Products.Include(c => c.Category).ToListAsync();
+            var products = await _context.Products
+                .Include(x => x.Category)
+                .ToListAsync();
+
             return View(products);
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await SendCategoriesViewBag();
-
+            await LoadCategories();
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Product product)
+        public async Task<IActionResult> Create(ProductVM vm)
         {
+            await LoadCategories();
+
             if (!ModelState.IsValid)
+                return View(vm);
+
+            if (!await _context.Categories.AnyAsync(x => x.Id == vm.CategoryId))
             {
-                await SendCategoriesViewBag();
-                return View(product);
+                ModelState.AddModelError("CategoryId", "Belə category mövcud deyil!");
+                return View(vm);
             }
 
+            string mainFileName = Guid.NewGuid() + Path.GetExtension(vm.MainImageFile.FileName);
+            string mainFilePath = Path.Combine(ImagePath, mainFileName);
 
-            var isExistsCategory = await _context.Categories.AnyAsync(x => x.Id == product.CategoryId);
+            using (FileStream fs = new(mainFilePath, FileMode.Create))
+                await vm.MainImageFile.CopyToAsync(fs);
 
-            if (!isExistsCategory)
+            List<string> additionalFileNames = new();
+
+            if (vm.AdditionalImageFiles != null)
             {
-                await SendCategoriesViewBag();
+                foreach (var file in vm.AdditionalImageFiles)
+                {
+                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(ImagePath, fileName);
 
-                ModelState.AddModelError("CategoryId", "Bele bir category movcud deyil!");
-                return View(product);
+                    using FileStream fs = new(filePath, FileMode.Create);
+                    await file.CopyToAsync(fs);
+
+                    additionalFileNames.Add(fileName);
+                }
             }
+
+            Product product = new()
+            {
+                Name = vm.Name,
+                Description = vm.Description,
+                Price = vm.Price,
+                CategoryId = vm.CategoryId,
+                isDeleted = vm.isDeleted,
+                MainImagePath = mainFileName,
+                AdditionalImagePaths = additionalFileNames.Any()
+                    ? string.Join(",", additionalFileNames)
+                    : null
+            };
 
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
@@ -53,9 +86,7 @@ namespace Pronia.Areas.Admin.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _context.Products.FindAsync(id);
-
-            if (product is null)
-                return NotFound();
+            if (product == null) return NotFound();
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
@@ -66,62 +97,85 @@ namespace Pronia.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
-            await SendCategoriesViewBag();
+            await LoadCategories();
 
             var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
 
-            if (product is not { })
-                return NotFound();
+            ProductVM vm = new()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                CategoryId = product.CategoryId,
+                isDeleted = product.isDeleted
+            };
 
-            return View(product);
-        }
+            ViewBag.MainImage = product.MainImagePath;
+            ViewBag.AdditionalImages = product.AdditionalImagePaths?.Split(',').ToList();
 
-        private async Task SendCategoriesViewBag()
-        {
-            var categories = await _context.Categories.ToListAsync();
-
-            ViewBag.Categories = categories;
+            return View(vm);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(Product product)
+        public async Task<IActionResult> Update(int id, ProductVM vm)
         {
+            await LoadCategories();
+
             if (!ModelState.IsValid)
-            {
-                await SendCategoriesViewBag();
+                return View(vm);
 
-                return View(product);
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+            if (!await _context.Categories.AnyAsync(x => x.Id == vm.CategoryId))
+            {
+                ModelState.AddModelError("CategoryId", "Belə category mövcud deyil!");
+                return View(vm);
             }
 
-            var existProduct = await _context.Products.FindAsync(product.Id);
+            product.Name = vm.Name;
+            product.Description = vm.Description;
+            product.Price = vm.Price;
+            product.CategoryId = vm.CategoryId;
+            product.isDeleted = vm.isDeleted;
 
-            if (existProduct is null)
-                return BadRequest();
-
-            var isExistsCategory = await _context.Categories.AnyAsync(x => x.Id == product.CategoryId);
-
-            if (!isExistsCategory)
+            if (vm.MainImageFile != null)
             {
-                await SendCategoriesViewBag();
+                string fileName = Guid.NewGuid() + Path.GetExtension(vm.MainImageFile.FileName);
+                string filePath = Path.Combine(ImagePath, fileName);
 
-                ModelState.AddModelError("CategoryId", "Bele bir category movcud deyil!");
-                return View(product);
+                using FileStream fs = new(filePath, FileMode.Create);
+                await vm.MainImageFile.CopyToAsync(fs);
+
+                product.MainImagePath = fileName;
             }
 
-            existProduct.Name = product.Name;
-            existProduct.Description = product.Description;
-            existProduct.CategoryId = product.CategoryId;
-            existProduct.ImagePath = product.ImagePath;
-            existProduct.Price = product.Price;
-            existProduct.isDeleted = product.isDeleted;
+            if (vm.AdditionalImageFiles != null && vm.AdditionalImageFiles.Any())
+            {
+                List<string> images = product.AdditionalImagePaths?
+                    .Split(',')
+                    .ToList() ?? new();
 
-            _context.Products.Update(existProduct);
+                foreach (var file in vm.AdditionalImageFiles)
+                {
+                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                    string filePath = Path.Combine(ImagePath, fileName);
+
+                    using FileStream fs = new(filePath, FileMode.Create);
+                    await file.CopyToAsync(fs);
+
+                    images.Add(fileName);
+                }
+
+                product.AdditionalImagePaths = string.Join(",", images);
+            }
+
             await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
         public async Task<IActionResult> Toggle(int id)
         {
             var product = await _context.Products.FindAsync(id);
@@ -131,6 +185,11 @@ namespace Pronia.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadCategories()
+        {
+            ViewBag.Categories = await _context.Categories.ToListAsync();
         }
     }
 }
