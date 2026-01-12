@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pronia.Contexts;
 using Pronia.Models;
@@ -8,78 +13,166 @@ namespace Pronia.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AutoValidateAntiforgeryToken]
-    public class ProductController(ProniaDbContext _context, IWebHostEnvironment _env) : Controller
+    public class ProductController : Controller
     {
-        private string ImagePath => Path.Combine(_env.WebRootPath, "assets/images/website-images");
+        private readonly ProniaDbContext _context;
+        private readonly IWebHostEnvironment _env;
+
+        public ProductController(ProniaDbContext context, IWebHostEnvironment env)
+        {
+            _context = context;
+            _env = env;
+        }
 
         public async Task<IActionResult> Index()
         {
             var products = await _context.Products
-                .Include(x => x.Category)
+                .Include(p => p.Category)
                 .ToListAsync();
-
             return View(products);
         }
 
-        [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await LoadCategories();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductVM vm)
         {
-            await LoadCategories();
-
             if (!ModelState.IsValid)
-                return View(vm);
-
-            if (!await _context.Categories.AnyAsync(x => x.Id == vm.CategoryId))
             {
-                ModelState.AddModelError("CategoryId", "Belə category mövcud deyil!");
+                ViewBag.Categories = await _context.Categories.ToListAsync();
                 return View(vm);
             }
 
-            string mainFileName = Guid.NewGuid() + Path.GetExtension(vm.MainImageFile.FileName);
-            string mainFilePath = Path.Combine(ImagePath, mainFileName);
-
-            using (FileStream fs = new(mainFilePath, FileMode.Create))
-                await vm.MainImageFile.CopyToAsync(fs);
-
-            List<string> additionalFileNames = new();
-
-            if (vm.AdditionalImageFiles != null)
+            string mainFileName = Guid.NewGuid().ToString() + "_" + vm.MainImageFile.FileName;
+            string mainPath = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", mainFileName);
+            using (FileStream stream = new FileStream(mainPath, FileMode.Create))
             {
-                foreach (var file in vm.AdditionalImageFiles)
-                {
-                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-                    string filePath = Path.Combine(ImagePath, fileName);
-
-                    using FileStream fs = new(filePath, FileMode.Create);
-                    await file.CopyToAsync(fs);
-
-                    additionalFileNames.Add(fileName);
-                }
+                await vm.MainImageFile.CopyToAsync(stream);
             }
 
-            Product product = new()
+            Product product = new Product
             {
                 Name = vm.Name,
                 Description = vm.Description,
                 Price = vm.Price,
                 CategoryId = vm.CategoryId,
-                isDeleted = vm.isDeleted,
                 MainImagePath = mainFileName,
-                AdditionalImagePaths = additionalFileNames.Any()
-                    ? string.Join(",", additionalFileNames)
-                    : null
+                isDeleted = false
             };
+
+            if (vm.AdditionalImageFiles != null)
+            {
+                List<string> addFiles = new List<string>();
+                foreach (var file in vm.AdditionalImageFiles)
+                {
+                    string addName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                    string addPath = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", addName);
+                    using (FileStream stream = new FileStream(addPath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    addFiles.Add(addName);
+                }
+                product.AdditionalImagePaths = string.Join(",", addFiles);
+            }
 
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
+        public async Task<IActionResult> Update(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            ViewBag.MainImage = product.MainImagePath;
+            ViewBag.AdditionalImages = product.AdditionalImagePaths?.Split(',').ToList();
+
+            ProductVM vm = new ProductVM
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                CategoryId = product.CategoryId
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(ProductVM vm)
+        {
+            var existed = await _context.Products.FindAsync(vm.Id);
+            if (existed == null) return NotFound();
+
+            if (vm.MainImageFile == null)
+            {
+                ModelState.Remove("MainImageFile");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+
+                ViewBag.MainImagePath = existed.MainImagePath;
+                ViewBag.AdditionalImagePaths = existed.AdditionalImagePaths?.Split(',').ToList();
+                return View(vm);
+            }
+
+            existed.Name = vm.Name;
+            existed.Description = vm.Description;
+            existed.Price = vm.Price;
+            existed.CategoryId = vm.CategoryId;
+
+            if (vm.MainImageFile != null)
+            {
+                string oldPath = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", existed.MainImagePath);
+                if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
+
+                string newFileName = Guid.NewGuid().ToString() + "_" + vm.MainImageFile.FileName;
+                string newPath = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", newFileName);
+
+                using (FileStream stream = new FileStream(newPath, FileMode.Create))
+                {
+                    await vm.MainImageFile.CopyToAsync(stream);
+                }
+                existed.MainImagePath = newFileName;
+            }
+
+            if (vm.AdditionalImageFiles != null && vm.AdditionalImageFiles.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(existed.AdditionalImagePaths))
+                {
+                    foreach (var imgName in existed.AdditionalImagePaths.Split(','))
+                    {
+                        string path = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", imgName);
+                        if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
+                    }
+                }
+
+                List<string> newAddFilenames = new List<string>();
+                foreach (var file in vm.AdditionalImageFiles)
+                {
+                    string fileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                    string path = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", fileName);
+                    using (FileStream stream = new FileStream(path, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    newAddFilenames.Add(fileName);
+                }
+                existed.AdditionalImagePaths = string.Join(",", newAddFilenames);
+            }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -88,91 +181,24 @@ namespace Pronia.Areas.Admin.Controllers
             var product = await _context.Products.FindAsync(id);
             if (product == null) return NotFound();
 
+            if (!string.IsNullOrEmpty(product.MainImagePath))
+            {
+                string mainPath = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", product.MainImagePath);
+                if (System.IO.File.Exists(mainPath)) System.IO.File.Delete(mainPath);
+            }
+
+            if (!string.IsNullOrEmpty(product.AdditionalImagePaths))
+            {
+                foreach (var imgName in product.AdditionalImagePaths.Split(','))
+                {
+                    string addPath = Path.Combine(_env.WebRootPath, "assets", "images", "website-images", imgName);
+                    if (System.IO.File.Exists(addPath)) System.IO.File.Delete(addPath);
+                }
+            }
+
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Update(int id)
-        {
-            await LoadCategories();
-
-            var product = await _context.Products.FindAsync(id);
-            if (product == null) return NotFound();
-
-            ProductVM vm = new()
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                CategoryId = product.CategoryId,
-                isDeleted = product.isDeleted
-            };
-
-            ViewBag.MainImage = product.MainImagePath;
-            ViewBag.AdditionalImages = product.AdditionalImagePaths?.Split(',').ToList();
-
-            return View(vm);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Update(int id, ProductVM vm)
-        {
-            await LoadCategories();
-
-            if (!ModelState.IsValid)
-                return View(vm);
-
-            var product = await _context.Products.FindAsync(id);
-            if (product == null) return NotFound();
-
-            if (!await _context.Categories.AnyAsync(x => x.Id == vm.CategoryId))
-            {
-                ModelState.AddModelError("CategoryId", "Belə category mövcud deyil!");
-                return View(vm);
-            }
-
-            product.Name = vm.Name;
-            product.Description = vm.Description;
-            product.Price = vm.Price;
-            product.CategoryId = vm.CategoryId;
-            product.isDeleted = vm.isDeleted;
-
-            if (vm.MainImageFile != null)
-            {
-                string fileName = Guid.NewGuid() + Path.GetExtension(vm.MainImageFile.FileName);
-                string filePath = Path.Combine(ImagePath, fileName);
-
-                using FileStream fs = new(filePath, FileMode.Create);
-                await vm.MainImageFile.CopyToAsync(fs);
-
-                product.MainImagePath = fileName;
-            }
-
-            if (vm.AdditionalImageFiles != null && vm.AdditionalImageFiles.Any())
-            {
-                List<string> images = product.AdditionalImagePaths?
-                    .Split(',')
-                    .ToList() ?? new();
-
-                foreach (var file in vm.AdditionalImageFiles)
-                {
-                    string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-                    string filePath = Path.Combine(ImagePath, fileName);
-
-                    using FileStream fs = new(filePath, FileMode.Create);
-                    await file.CopyToAsync(fs);
-
-                    images.Add(fileName);
-                }
-
-                product.AdditionalImagePaths = string.Join(",", images);
-            }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -182,14 +208,9 @@ namespace Pronia.Areas.Admin.Controllers
             if (product == null) return NotFound();
 
             product.isDeleted = !product.isDeleted;
+
             await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
-        }
-
-        private async Task LoadCategories()
-        {
-            ViewBag.Categories = await _context.Categories.ToListAsync();
         }
     }
 }

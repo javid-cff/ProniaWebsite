@@ -18,7 +18,7 @@ namespace Pronia.Controllers
         public async Task<IActionResult> Index()
         {
             List<Card> cards = await _context.Cards.Where(c => c.isOnline).ToListAsync();
-            List<Product> products = await _context.Products.Where(c => c.isDeleted).ToListAsync();
+            List<Product> products = await _context.Products.Where(c => !c.isDeleted).ToListAsync();
 
             var model = Tuple.Create(cards, products);
 

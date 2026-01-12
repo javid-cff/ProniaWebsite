@@ -1,33 +1,39 @@
-﻿@model List<ProductVM>
+﻿@model List<Product>
 
-<div class="container">
+<div class="container mt-5">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: SlateBlue; font-family: 'Segoe UI', sans-serif; margin: 0;">Product List</h2>
+
+        <a asp-area="Admin"
+           asp-controller="Product"
+           asp-action="Create"
+           style="background-color: Green; color: white; padding: 10px 20px;
+                  border-radius: 8px; font-size: 16px; font-weight: 600;
+                  display: flex; align-items: center; gap: 8px;
+                  text-decoration: none; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"
+           onmouseover="this.style.backgroundColor='#006400'; this.style.transform='translateY(-2px)';"
+           onmouseout="this.style.backgroundColor='Green'; this.style.transform='translateY(0)';"
+           title="Yeni məhsul əlavə et">
+            <span>➕ Create New Product</span>
+        </a>
+    </div>
+
     <div class="row">
         <table class="table"
-               style="width:100%; border-collapse:collapse; font-family:Segoe UI, Arial, sans-serif;
+               style="width:100%; border-collapse:collapse; font-family:'Segoe UI', Arial, sans-serif;
                       background-color:GhostWhite; border-radius:10px; overflow:hidden;
                       box-shadow:0 4px 12px rgba(0,0,0,0.08);">
 
             <thead>
                 <tr style="background-color:SlateBlue; color:White;">
                     <th style="padding:14px;">Id</th>
+                    <th style="padding:14px;">Image</th>
                     <th style="padding:14px;">Name</th>
                     <th style="padding:14px;">Description</th>
                     <th style="padding:14px;">Price</th>
-                    <th style="padding:14px;">Image</th>
                     <th style="padding:14px;">Category</th>
-                    <th style="padding:14px; text-align:center;">Online</th>
-                    <th style="padding:14px; position:relative;">
-                        Actions
-                        <a asp-area="Admin"
-                           asp-controller="Product"
-                           asp-action="Create"
-                           style="position:absolute; right:10px; top:50%; transform:translateY(-50%);
-                                  background-color:Green; color:white; width:40px; height:40px;
-                                  border-radius:8px; font-size:20px; display:flex;
-                                  align-items:center; justify-content:center; text-decoration:none;">
-                            ➕
-                        </a>
-                    </th>
+                    <th style="padding:14px; text-align:center;">Status</th>
+                    <th style="padding:14px; text-align:right;">Actions</th>
                 </tr>
             </thead>
 
@@ -35,74 +41,72 @@
                 @foreach (var product in Model)
                 {
                     <tr style="background-color:WhiteSmoke; transition:0.2s;"
-                        onmouseover="this.style.backgroundColor='LightCyan'; this.style.transform='scale(1.01)'"
-                        onmouseout="this.style.backgroundColor='WhiteSmoke'; this.style.transform='scale(1)'">
+                        onmouseover="this.style.backgroundColor='LightCyan';"
+                        onmouseout="this.style.backgroundColor='WhiteSmoke';">
 
                         <td style="padding:12px; font-weight:600;">@product.Id</td>
-                        <td style="padding:12px;">@product.Name</td>
-                        <td style="padding:12px; color:DimGray;">
-                            @(string.IsNullOrWhiteSpace(product.Description) ? "-" : product.Description)
-                        </td>
-                        <td style="padding:12px;">@product.Price ₼</td>
 
                         <td style="padding:12px;">
-                            <img src="~/assets/images/website-images/@product.MainImageFile"
-                                 style="width:50px; height:50px; object-fit:cover;
-                                            border-radius:4px; border:1px solid #ccc;" />
+                            <img src="~/assets/images/website-images/@product.MainImagePath"
+                                 style="width:60px; height:60px; object-fit:cover;
+                                            border-radius:8px; border:1px solid #ddd;"
+                                 alt="@product.Name" />
                         </td>
 
-                        <td style="padding:12px;">@product.CategoryName</td>
+                        <td style="padding:12px; font-weight:bold;">@product.Name</td>
+
+                        <td style="padding:12px; color:DimGray; max-width:250px;">
+                            <div style="overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                @(string.IsNullOrWhiteSpace(product.Description) ? "Təsvir yoxdur" : product.Description)
+                            </div>
+                        </td>
+
+                        <td style="padding:12px; font-weight:bold; color:SlateBlue;">@product.Price ₼</td>
+
+                        <td style="padding:12px;">
+                            <span class="badge" style="background-color:#eef; color:SlateBlue; padding:5px 10px; border-radius:15px; font-size: 0.9em;">
+                                @product.Category?.Name
+                            </span>
+                        </td>
 
                         <td style="padding:12px; text-align:center;">
                             @if (!product.isDeleted)
                             {
-                                <span style="color:Green; font-weight:600;">Yes</span>
+                                <span style="color:Green; font-weight:600;">● Online</span>
                             }
                             else
                             {
-                                <span style="color:Red; font-weight:600;">No</span>
+                                <span style="color:Red; font-weight:600;">● Offline</span>
                             }
                         </td>
 
                         <td style="padding:12px;">
-                            <div style="display:flex; justify-content:center; gap:6px;">
-
-                                <a asp-area="Admin"
-                                   asp-controller="Product"
-                                   asp-action="Update"
-                                   asp-route-id="@product.Id"
-                                   style="background-color:Gold; width:35px; height:35px;
-                                              border-radius:6px; display:flex;
-                                              align-items:center; justify-content:center; text-decoration:none;">
+                            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Update" asp-route-id="@product.Id"
+                                   title="Düzəliş et"
+                                   style="background-color:Gold; width:32px; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
                                     ✏️
                                 </a>
 
-                                <a asp-area="Admin"
-                                   asp-controller="Product"
-                                   asp-action="Delete"
-                                   asp-route-id="@product.Id"
-                                   style="background-color:Crimson; width:35px; height:35px;
-                                              border-radius:6px; display:flex;
-                                              align-items:center; justify-content:center; text-decoration:none;">
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-id="@product.Id"
+                                   title="Sil"
+                                   onclick="return confirm('Silmək istədiyinizə əminsiniz?')"
+                                   style="background-color:Crimson; width:32px; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
                                     🗑️
                                 </a>
 
-                                <a asp-area="Admin"
-                                   asp-controller="Product"
-                                   asp-action="Toggle"
-                                   asp-route-id="@product.Id"
-                                   style="background-color:DeepSkyBlue; width:35px; height:35px;
-                                              border-radius:6px; display:flex;
-                                              align-items:center; justify-content:center; text-decoration:none;">
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Toggle" asp-route-id="@product.Id"
+                                   title="Statusu dəyiş"
+                                   style="background-color:DeepSkyBlue; width:32px; height:32px;
+                                              border-radius:6px; display:flex; align-items:center;
+                                              justify-content:center; text-decoration:none; transition:0.2s;">
                                     🔄
                                 </a>
-
                             </div>
                         </td>
                     </tr>
                 }
             </tbody>
-
         </table>
     </div>
 </div>

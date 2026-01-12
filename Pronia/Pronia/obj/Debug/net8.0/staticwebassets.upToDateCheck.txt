@@ -977,7 +977,6 @@ wwwroot\assets\images\website-images\1-1-310x220.jpg
 wwwroot\assets\images\website-images\1-1-524x617.png
 wwwroot\assets\images\website-images\1-1-570x633.jpg
 wwwroot\assets\images\website-images\1-1-768x546.webp
-wwwroot\assets\images\website-images\1-1-770x300.jpg
 wwwroot\assets\images\website-images\1-1.jpg
 wwwroot\assets\images\website-images\1-1.png
 wwwroot\assets\images\website-images\1-10-270x300.jpg
@@ -1015,10 +1014,15 @@ wwwroot\assets\images\website-images\2-2-370x270.webp
 wwwroot\assets\images\website-images\2-2-70x78.png
 wwwroot\assets\images\website-images\2-3-70x78.png
 wwwroot\assets\images\website-images\2.png
+wwwroot\assets\images\website-images\211fadbf-2f5a-4401-a05a-0c1cb9c2879d_sekil3.jpg
 wwwroot\assets\images\website-images\3.png
+wwwroot\assets\images\website-images\4d388f90-356a-407d-959d-f616372b630b_sekil4.jpg
+wwwroot\assets\images\website-images\54212a21-7a94-4cdc-a8f3-b6908df592f9_sekil.jpg
+wwwroot\assets\images\website-images\ae43adc9-b36c-4d11-a57d-3f8c45db001b_sekil1.jpg
 wwwroot\assets\images\website-images\car.png
 wwwroot\assets\images\website-images\card.png
 wwwroot\assets\images\website-images\dark.png
+wwwroot\assets\images\website-images\f3a84799-3628-42b4-b0c4-d94f5513cdc3_sekil2.jpg
 wwwroot\assets\images\website-images\quotation.png
 wwwroot\assets\images\website-images\service.png
 wwwroot\assets\js\main.js
