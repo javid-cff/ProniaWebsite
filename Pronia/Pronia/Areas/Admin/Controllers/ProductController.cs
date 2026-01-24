@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Pronia.Contexts;
 using Pronia.Models;
 using Pronia.ViewModels;
+using Pronia.ViewModels.ProductViewModels;
 
 namespace Pronia.Areas.Admin.Controllers
 {
@@ -26,9 +27,18 @@ namespace Pronia.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var products = await _context.Products
-                .Include(p => p.Category)
-                .ToListAsync();
+            var products = await _context.Products.Select(p => new ProductGetVM
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                MainImagePath = p.MainImagePath,
+                CategoryName = p.Category.Name,
+                isDeleted = p.isDeleted,
+                AdditionalImagePath = new List<string> { p.AdditionalImagePaths }
+            }).ToListAsync();
+
             return View(products);
         }
 
@@ -39,8 +49,7 @@ namespace Pronia.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProductVM vm)
+        public async Task<IActionResult> Create(ProductCreateVM vm)
         {
             if (!ModelState.IsValid)
             {
@@ -95,7 +104,7 @@ namespace Pronia.Areas.Admin.Controllers
             ViewBag.MainImage = product.MainImagePath;
             ViewBag.AdditionalImages = product.AdditionalImagePaths?.Split(',').ToList();
 
-            ProductVM vm = new ProductVM
+            ProductUpdateVM vm = new ProductUpdateVM
             {
                 Id = product.Id,
                 Name = product.Name,
@@ -107,8 +116,7 @@ namespace Pronia.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(ProductVM vm)
+        public async Task<IActionResult> Update(ProductUpdateVM vm)
         {
             var existed = await _context.Products.FindAsync(vm.Id);
             if (existed == null) return NotFound();

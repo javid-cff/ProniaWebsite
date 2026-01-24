@@ -1,4 +1,4 @@
-﻿@model List<Product>
+﻿@model List<ProductGetVM>
 
 <div class="container mt-5">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -65,7 +65,7 @@
 
                         <td style="padding:12px;">
                             <span class="badge" style="background-color:#eef; color:SlateBlue; padding:5px 10px; border-radius:15px; font-size: 0.9em;">
-                                @product.Category?.Name
+                                @product.CategoryName
                             </span>
                         </td>
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pronia.Contexts;
 using Pronia.ViewModels;
+using Pronia.ViewModels.ProductViewModels;
 
 namespace Pronia.Controllers
 {
@@ -22,6 +23,23 @@ namespace Pronia.Controllers
             {
                 Products = products,
                 Categories = categories
+            };
+
+            return View(vm);
+        }
+
+        public async Task<IActionResult> ProductDetails(int id)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null) return NotFound();
+
+            var cards = await _context.Cards.Take(3).ToListAsync();
+
+            ProductDetailVM vm = new ProductDetailVM
+            {
+                Products = product,
+                Cards = cards
             };
 
             return View(vm);
